@@ -26,7 +26,7 @@ function BookGeneration() {
   const handleDelete = async (id) => {
     try {
       await bookService.deleteBook(id);
-      setBookList((prev) => prev.filter((book) => book.id !== id));
+      await loadBooks();
     } catch (error) {
       console.error('책 삭제 중 오류:', error);
     }
@@ -40,7 +40,7 @@ function BookGeneration() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleGenerate = async (e) => {
     e.preventDefault();
     setGenerating(true);
     try {
@@ -59,12 +59,12 @@ function BookGeneration() {
 
   const handleSave = async () => {
     try {
-      const bookWithId = {
+      const bookToSave = {
         ...bookInfo,
-        id: Date.now()
+        id: Date.now() // 로컬 식별자
       };
-      await bookService.saveBook(bookWithId);
-      await loadBooks(); // 책 목록 새로고침
+      await bookService.saveBook(bookToSave);
+      await loadBooks();
     } catch (error) {
       console.error('책 저장 중 오류:', error);
     }
@@ -94,6 +94,7 @@ function BookGeneration() {
   return (
     <div style={{ maxWidth: 700, margin: '40px auto', border: '2px solid #357', borderRadius: '20px', padding: 24, background: '#fff' }}>
       <h1 style={{ textAlign: 'center', marginBottom: 24 }}>BOOK COVER GENERATE</h1>
+
       <div style={{ display: 'flex', gap: 24 }}>
         {/* COVER 영역 */}
         <div style={{ flex: 1 }}>
@@ -111,34 +112,34 @@ function BookGeneration() {
           <div style={{ marginBottom: 12, fontWeight: 'bold' }}>info</div>
           <div style={{ marginBottom: 8 }}>
             <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>title</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               name="title"
               value={bookInfo.title}
               onChange={handleChange}
-              style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }} 
+              style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
             />
           </div>
           <div style={{ marginBottom: 12 }}>
             <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>content</label>
-            <textarea 
+            <textarea
               name="content"
               value={bookInfo.content}
               onChange={handleChange}
               style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
-            ></textarea>
+            />
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button 
-              type="button" 
-              onClick={handleSubmit} 
+            <button
+              type="button"
+              onClick={handleGenerate}
               style={{ padding: '6px 18px' }}
               disabled={generating}
             >
               {generating ? 'generating...' : 'generate'}
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={handleSave}
               style={{ padding: '6px 18px' }}
             >
@@ -148,22 +149,26 @@ function BookGeneration() {
         </div>
       </div>
 
+      {/* 리스트 헤더 + 리프레시 버튼 */}
+      <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <button onClick={loadBooks} style={{ fontSize: 12, padding: '4px 10px' }}>🔄 refresh</button>
+        <div style={{ fontWeight: 'bold' }}>Book List</div>
+      </div>
+
       {/* BOOK LIST */}
-      <div style={{ marginTop: 32 }}>
+      <div style={{ marginTop: 16 }}>
         {bookList.map((book) => (
-          <div 
-          key={book.id}
-           style={{
+          <div key={book.id} style={{
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '12px',
+            alignItems: 'center',
+            marginBottom: 12,
             border: '1px solid #bbb',
             padding: '12px 16px',
             borderRadius: '8px',
             background: '#fafbfc'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               {book.imageUrl && <img src={book.imageUrl} alt="thumb" style={thumbStyle} />}
               <span style={{ fontWeight: 500 }}>{book.title}</span>
             </div>
