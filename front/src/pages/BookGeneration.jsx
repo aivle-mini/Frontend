@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { bookService } from '../services/bookService';
 
 function BookGeneration() {
-  const [bookInfo, setBookInfo] = useState({ title: '', content: '' });
+  const [bookInfo, setBookInfo] = useState({
+    title: '',
+    content: '',
+    imageUrl: null // 이미지도 bookInfo에 포함
+  });
   const [generating, setGenerating] = useState(false);
   const [bookList, setBookList] = useState([]);
-  const [previewImage, setPreviewImage] = useState(null); // 추가: 생성된 이미지
 
   useEffect(() => {
     loadBooks();
@@ -31,7 +34,10 @@ function BookGeneration() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBookInfo(prev => ({ ...prev, [name]: value }));
+    setBookInfo(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -39,10 +45,11 @@ function BookGeneration() {
     setGenerating(true);
     try {
       // DALL E 직접 호출 옵션 활성화
-      const generatedBook = await bookService.generateBook(bookInfo, { useLocalAI: true });
-      await bookService.saveBook(generatedBook);
-      setPreviewImage(generatedBook.imageUrl); // 이미지 미리보기
-      await loadBooks();
+      const generated = await bookService.generateBook(bookInfo, { useLocalAI: true });
+      setBookInfo(prev => ({
+        ...prev,
+        imageUrl: generated.imageUrl
+      }));
     } catch (error) {
       console.error('책 생성 중 오류:', error);
     } finally {
@@ -52,12 +59,11 @@ function BookGeneration() {
 
   const handleSave = async () => {
     try {
-      const book = {
+      const bookWithId = {
         ...bookInfo,
-        id: Date.now(),
-        imageUrl: previewImage // 저장 시 현재 미리보기 이미지 포함한 완전 책 객체
+        id: Date.now()
       };
-      await bookService.saveBook(book);
+      await bookService.saveBook(bookWithId);
       await loadBooks(); // 책 목록 새로고침
     } catch (error) {
       console.error('책 저장 중 오류:', error);
@@ -92,8 +98,8 @@ function BookGeneration() {
         {/* COVER 영역 */}
         <div style={{ flex: 1 }}>
           <div style={coverStyle}>
-            {previewImage ? (
-              <img src={previewImage} alt="book cover" style={{ maxHeight: '100%' }} />
+            {bookInfo.imageUrl ? (
+              <img src={bookInfo.imageUrl} alt="book cover" style={{ maxHeight: '100%' }} />
             ) : (
               'COVER'
             )}
@@ -105,17 +111,17 @@ function BookGeneration() {
           <div style={{ marginBottom: 12, fontWeight: 'bold' }}>info</div>
           <div style={{ marginBottom: 8 }}>
             <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>title</label>
-            <input
-              type="text"
+            <input 
+              type="text" 
               name="title"
               value={bookInfo.title}
               onChange={handleChange}
-              style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
+              style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }} 
             />
           </div>
           <div style={{ marginBottom: 12 }}>
             <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>content</label>
-            <textarea
+            <textarea 
               name="content"
               value={bookInfo.content}
               onChange={handleChange}
@@ -123,16 +129,16 @@ function BookGeneration() {
             ></textarea>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              type="button"
-              onClick={handleSubmit}
+            <button 
+              type="button" 
+              onClick={handleSubmit} 
               style={{ padding: '6px 18px' }}
               disabled={generating}
             >
               {generating ? 'generating...' : 'generate'}
             </button>
-            <button
-              type="button"
+            <button 
+              type="button" 
               onClick={handleSave}
               style={{ padding: '6px 18px' }}
             >
@@ -145,19 +151,18 @@ function BookGeneration() {
       {/* BOOK LIST */}
       <div style={{ marginTop: 32 }}>
         {bookList.map((book) => (
-          <div
-            key={book.id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '12px',
-              border: '1px solid #bbb',
-              padding: '12px 16px',
-              borderRadius: '8px',
-              background: '#fafbfc'
-            }}
-          >
+          <div 
+          key={book.id}
+           style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '12px',
+            border: '1px solid #bbb',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            background: '#fafbfc'
+          }}>
             <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               {book.imageUrl && <img src={book.imageUrl} alt="thumb" style={thumbStyle} />}
               <span style={{ fontWeight: 500 }}>{book.title}</span>
