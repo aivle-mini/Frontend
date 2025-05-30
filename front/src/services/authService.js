@@ -64,5 +64,31 @@ export const authService = {
   getCurrentUser: () => {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
+  },
+
+  findPassword: async (username, email) => {
+  try {
+    const response = await fetch(`${API_URL}/v1/users/find-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ username, email })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || '비밀번호 찾기에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    return data; // 예: { password: '1234abcd' }
+  } catch (error) {
+    if (error.message === 'Failed to fetch') {
+      throw new Error('서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.');
+    }
+    throw error;
   }
+}
 };
