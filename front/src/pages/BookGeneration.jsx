@@ -188,6 +188,11 @@ function BookGeneration() {
             </div>
           </div>
         </div>
+        {/* 리스트 헤더 + 리프레시 버튼 */}
+        <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <button onClick={loadBooks} style={{ fontSize: 12, padding: '4px 10px' }}>🔄 refresh</button>
+          <div style={{ fontWeight: 'bold' }}>Book List</div>
+        </div>
         {/* BOOK LIST 하단 영역 */}
         <div style={{ marginTop: 32 }}>
           {bookList.map((book) => (
