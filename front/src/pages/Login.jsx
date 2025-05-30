@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 
 function Login() {
   const navigate = useNavigate();
@@ -17,24 +17,13 @@ function Login() {
     setErrorMsg('');           // 에러 초기화
 
     try {
-      const res = await axios.post('/api/v1/users/login', {
-        username: formData.username,
-        password: formData.password
-      });
-
-      // ✅ 성공: 토큰 저장
-      const { accessToken, refreshToken } = res.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      await authService.login(formData.username, formData.password);
 
       // 도서 목록 페이지로 이동
       navigate('/books');
     } catch (err) {
       // ❌ 실패: 메시지 표시
-      const msg =
-        err.response?.data?.message ||
-        '이메일 또는 비밀번호가 올바르지 않습니다.';
-      setErrorMsg(msg);
+      setErrorMsg(err.message);
     }
   };
 
