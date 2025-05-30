@@ -1,20 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Container, 
-  Grid, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
-  Box 
-} from '@mui/material';
 
 function BookGeneration() {
-  const [bookInfo, setBookInfo] = useState({
-    title: '',
-    content: ''
-  });
+  const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
+  // [임시] 책 리스트와 삭제 핸들러 추가 (실제 API 연동 전용)
   const [bookList, setBookList] = useState([
     { id: 1, title: 'BOOK LIST 1' },
     { id: 2, title: 'BOOK LIST 2' },
@@ -25,12 +14,17 @@ function BookGeneration() {
     setBookList((prev) => prev.filter((book) => book.id !== id));
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setBookInfo(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // COVER 이미지(임시)
+  const coverStyle = {
+    width: '100%',
+    height: '250px',
+    background: '#eee',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '2rem',
+    border: '1px solid #bbb',
+    borderRadius: '8px',
   };
 
   const handleSubmit = async (e) => {
@@ -38,7 +32,7 @@ function BookGeneration() {
     setGenerating(true);
     try {
       // TODO: API 연동
-      console.log('책 생성 요청:', bookInfo);
+      console.log('책 생성 요청:', prompt);
     } catch (error) {
       console.error('책 생성 중 오류:', error);
     } finally {
@@ -47,114 +41,45 @@ function BookGeneration() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, minHeight: '100vh' }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center">
-        BOOK COVER GENERATE
-      </Typography>
-      
-      <Grid container spacing={4}>
-        {/* 왼쪽 커버 미리보기 */}
-        <Grid item xs={12} md={8} lg={7}>
-          <Paper
-            sx={{
-              p: 4,
-              height: 700,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              bgcolor: '#f5f5f5'
-            }}
-          >
-            <Typography variant="h2" component="h2" gutterBottom>
-              COVER
-            </Typography>
-            <Typography variant="h4">
-              {bookInfo.title || '제목을 입력하세요'}
-            </Typography>
-          </Paper>
-        </Grid>
-
-        {/* 오른쪽 입력 폼 */}
-        <Grid item xs={12} md={4} lg={5}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              책 정보 입력
-            </Typography>
-            <Box component="form" onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                label="제목"
-                name="title"
-                value={bookInfo.title}
-                onChange={handleChange}
-                margin="normal"
-                variant="outlined"
-              />
-              <TextField
-                fullWidth
-                label="내용"
-                name="content"
-                value={bookInfo.content}
-                onChange={handleChange}
-                margin="normal"
-                variant="outlined"
-                multiline
-                rows={4}
-              />
-              <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  disabled={generating}
-                >
-                  {generating ? '생성 중...' : '생성하기'}
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  disabled={generating}
-                >
-                  저장하기
-                </Button>
-              </Box>
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
-
-      {/* 하단 책 목록 */}
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h6" gutterBottom align="center">
-          생성된 책 목록
-        </Typography>
-        <Grid container spacing={2} sx={{ maxWidth: 800, mx: 'auto' }}>
-          {bookList.map((book) => (
-            <Grid item xs={12} key={book.id}>
-              <Paper
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
-              >
-                <Typography>{book.title}</Typography>
-                <Button 
-                  variant="outlined" 
-                  color="error" 
-                  size="small"
-                  onClick={() => handleDelete(book.id)}
-                >
-                  삭제
-                </Button>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    </Container>
+    <div style={{ maxWidth: 700, margin: '40px auto', border: '2px solid #357', borderRadius: '20px', padding: 24, background: '#fff' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: 24 }}>BOOK COVER GENERATE</h1>
+      <div style={{ display: 'flex', gap: 24 }}>
+        {/* COVER 영역 */}
+        <div style={{ flex: 1 }}>
+          <div style={coverStyle}>COVER</div>
+        </div>
+        {/* info 입력 영역 */}
+        <div style={{ flex: 1, borderLeft: '2px solid #eee', paddingLeft: 24 }}>
+          <div style={{ marginBottom: 12, fontWeight: 'bold' }}>info</div>
+          <div style={{ marginBottom: 8 }}>
+            <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>title</label>
+            <input 
+              type="text" 
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }} 
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>content</label>
+            <textarea style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}></textarea>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="button" onClick={handleSubmit} style={{ padding: '6px 18px' }}>generate</button>
+            <button type="button" style={{ padding: '6px 18px' }}>save</button>
+          </div>
+        </div>
+      </div>
+      {/* BOOK LIST 하단 영역 */}
+      <div style={{ marginTop: 32 }}>
+        {bookList.map((book) => (
+          <div key={book.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', border: '1px solid #bbb', padding: '12px 16px', borderRadius: '8px', background: '#fafbfc' }}>
+            <span style={{ fontWeight: 500 }}>{book.title}</span>
+            <button onClick={() => handleDelete(book.id)} style={{ padding: '4px 16px' }}>delete</button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
