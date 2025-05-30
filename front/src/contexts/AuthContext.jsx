@@ -1,29 +1,24 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
 
-  const login = async (email, password) => {
-    try {
-      const response = await authService.login(email, password);
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    }
+  const login = async (username, password) => {
+    const data = await authService.login(username, password);
+    setIsAuthenticated(true);
+    return data;
   };
 
   const logout = () => {
     authService.logout();
-    setUser(null);
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: authService.isAuthenticated }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
