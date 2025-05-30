@@ -1,17 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { bookService } from '../services/bookService';
 
 function BookGeneration() {
-  const [prompt, setPrompt] = useState('');
+  const [bookInfo, setBookInfo] = useState({
+    title: '',
+    content: ''
+  });
   const [generating, setGenerating] = useState(false);
-  // [임시] 책 리스트와 삭제 핸들러 추가 (실제 API 연동 전용)
-  const [bookList, setBookList] = useState([
-    { id: 1, title: 'BOOK LIST 1' },
-    { id: 2, title: 'BOOK LIST 2' },
-    { id: 3, title: 'BOOK LIST 3' },
-  ]);
+  const [bookList, setBookList] = useState([]);
 
-  const handleDelete = (id) => {
-    setBookList((prev) => prev.filter((book) => book.id !== id));
+  useEffect(() => {
+    loadBooks();
+  }, []);
+
+  const loadBooks = async () => {
+    try {
+      const books = await bookService.getBooks();
+      setBookList(books);
+    } catch (error) {
+      console.error('책 목록 로딩 중 오류:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await bookService.deleteBook(id);
+      setBookList((prev) => prev.filter((book) => book.id !== id));
+    } catch (error) {
+      console.error('책 삭제 중 오류:', error);
+    }
   };
 
   // COVER 이미지(임시)
@@ -27,16 +44,34 @@ function BookGeneration() {
     borderRadius: '8px',
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setBookInfo(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setGenerating(true);
     try {
-      // TODO: API 연동
-      console.log('책 생성 요청:', prompt);
+      const generatedBook = await bookService.generateBook(bookInfo);
+      await bookService.saveBook(generatedBook);
+      await loadBooks(); // 책 목록 새로고침
     } catch (error) {
       console.error('책 생성 중 오류:', error);
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await bookService.saveBook(bookInfo);
+      await loadBooks(); // 책 목록 새로고침
+    } catch (error) {
+      console.error('책 저장 중 오류:', error);
     }
   };
 
@@ -55,18 +90,37 @@ function BookGeneration() {
             <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>title</label>
             <input 
               type="text" 
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              name="title"
+              value={bookInfo.title}
+              onChange={handleChange}
               style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }} 
             />
           </div>
           <div style={{ marginBottom: 12 }}>
             <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>content</label>
-            <textarea style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}></textarea>
+            <textarea 
+              name="content"
+              value={bookInfo.content}
+              onChange={handleChange}
+              style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
+            ></textarea>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" onClick={handleSubmit} style={{ padding: '6px 18px' }}>generate</button>
-            <button type="button" style={{ padding: '6px 18px' }}>save</button>
+            <button 
+              type="button" 
+              onClick={handleSubmit} 
+              style={{ padding: '6px 18px' }}
+              disabled={generating}
+            >
+              {generating ? 'generating...' : 'generate'}
+            </button>
+            <button 
+              type="button" 
+              onClick={handleSave}
+              style={{ padding: '6px 18px' }}
+            >
+              save
+            </button>
           </div>
         </div>
       </div>

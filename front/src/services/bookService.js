@@ -6,13 +6,31 @@ export const bookService = {
     return response.json();
   },
 
-  generateBook: async (prompt) => {
+  generateBook: async (bookData) => {
     const response = await fetch(`${API_URL}/books/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify(bookData)
+    });
+    return response.json();
+  },
+
+  saveBook: async (bookData) => {
+    const response = await fetch(`${API_URL}/books`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bookData)
+    });
+    return response.json();
+  },
+
+  deleteBook: async (id) => {
+    const response = await fetch(`${API_URL}/books/${id}`, {
+      method: 'DELETE',
     });
     return response.json();
   },
