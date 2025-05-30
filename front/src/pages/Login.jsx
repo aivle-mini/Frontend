@@ -1,34 +1,74 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',   // API 스펙: username 사용
     password: ''
   });
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e) => {
+  /** 로그인 요청 */
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: 로그인 로직 구현
+    setErrorMsg('');           // 에러 초기화
+
+    try {
+      const res = await axios.post('/api/v1/users/login', {
+        username: formData.username,
+        password: formData.password
+      });
+
+      // ✅ 성공: 토큰 저장
+      const { accessToken, refreshToken } = res.data;
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      // 도서 목록 페이지로 이동
+      navigate('/books');
+    } catch (err) {
+      // ❌ 실패: 메시지 표시
+      const msg =
+        err.response?.data?.message ||
+        '이메일 또는 비밀번호가 올바르지 않습니다.';
+      setErrorMsg(msg);
+    }
+  };
+
+  /** 입력 변경 핸들러 */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: 360, margin: '0 auto' }}>
       <h1>로그인</h1>
+
       <form onSubmit={handleSubmit}>
         <input
-          type="email"
-          placeholder="이메일"
-          value={formData.email}
-          onChange={(e) => setFormData({...formData, email: e.target.value})}
+          name="username"
+          type="text"
+          placeholder="아이디(또는 이메일)"
+          value={formData.username}
+          onChange={handleChange}
+          required
         />
         <input
+          name="password"
           type="password"
           placeholder="비밀번호"
           value={formData.password}
-          onChange={(e) => setFormData({...formData, password: e.target.value})}
+          onChange={handleChange}
+          required
         />
         <button type="submit">로그인</button>
       </form>
+
+      {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
     </div>
   );
 }
