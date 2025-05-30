@@ -28,7 +28,7 @@
 //               <Route path="/login" element={<Login />} />
 //               <Route path="/books" element={<BookList />} />
 //               <Route path="/generate" element={<BookGeneration />} />
-//               <Route path="/" element={<Navigate to="/books" replace />} />
+//               <Route path="/" element={<Navigate to="/login" replace />} />
 //             </Routes>
 //           </main>
 //         </div>
@@ -92,7 +92,7 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/books" element={<BookList />} />
           <Route path="/generate" element={<BookGeneration />} />
-          <Route path="/" element={<Navigate to="/books" replace />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
       </main>
     </div>
