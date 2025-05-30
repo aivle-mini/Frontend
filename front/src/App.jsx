@@ -44,9 +44,11 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import BookList from './pages/BookList';
 import BookGeneration from './pages/BookGeneration';
 import BookInformation from './pages/BookInformation';
+import ForgotPassword from './pages/ForgotPassword';
 import './App.css';
 
 function App() {
@@ -91,7 +93,10 @@ function AppContent() {
       <main>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/books" element={<BookList />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/books/:id/edit" element={<BookGeneration />} />
           <Route path="/books/:id" element={<BookInformation />} />
           <Route path="/generate" element={<BookGeneration />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
