@@ -5,20 +5,11 @@ function BookGeneration() {
   const [bookInfo, setBookInfo] = useState({
     title: '',
     content: '',
-    imageUrl: null // 이미지도 bookInfo에 포함
+    imageUrl: null
   });
   const [generating, setGenerating] = useState(false);
-<<<<<<< HEAD
   const [descPopup, setDescPopup] = useState({ open: false, desc: '' });
-  // [임시] 책 리스트와 삭제 핸들러 추가 (실제 API 연동 전용)
-  const [bookList, setBookList] = useState([
-    { id: 1, title: 'BOOK LIST 1' },
-    { id: 2, title: 'BOOK LIST 2' },
-    { id: 3, title: 'BOOK LIST 3' },
-  ]);
-=======
   const [bookList, setBookList] = useState([]);
->>>>>>> cover-image
 
   useEffect(() => {
     loadBooks();
@@ -102,7 +93,6 @@ function BookGeneration() {
   };
 
   return (
-<<<<<<< HEAD
     <div>
       {/* 상단 네비게이션 바 - 가로 정렬, 그림자, 여백, 심플 스타일 */}
       <nav style={{
@@ -132,7 +122,17 @@ function BookGeneration() {
         <div style={{ display: 'flex', gap: 24 }}>
           {/* COVER 영역 */}
           <div style={{ flex: 1 }}>
-            <div style={coverStyle}>COVER</div>
+            <div style={coverStyle}>
+              {bookInfo.imageUrl ? (
+                <img 
+                  src={bookInfo.imageUrl} 
+                  alt="생성된 책 표지" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                'COVER'
+              )}
+            </div>
           </div>
           {/* info 입력 영역 */}
           <div style={{ flex: 1, borderLeft: '2px solid #eee', paddingLeft: 24 }}>
@@ -141,18 +141,50 @@ function BookGeneration() {
               <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>제목</label>
               <input 
                 type="text" 
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
+                name="title"
+                value={bookInfo.title}
+                onChange={handleChange}
                 style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }} 
               />
             </div>
             <div style={{ marginBottom: 12 }}>
               <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>설명</label>
-              <textarea style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}></textarea>
+              <textarea 
+                name="content"
+                value={bookInfo.content}
+                onChange={handleChange}
+                style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
+              />
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button type="button" onClick={handleSubmit} style={{ padding: '6px 18px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4 }}>생성하기</button>
-              <button type="button" style={{ padding: '6px 18px' }}>저장</button>
+              <button 
+                type="button" 
+                onClick={handleGenerate}
+                disabled={generating}
+                style={{ 
+                  padding: '6px 18px', 
+                  background: generating ? '#ccc' : '#2563eb', 
+                  color: '#fff', 
+                  border: 'none', 
+                  borderRadius: 4,
+                  cursor: generating ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {generating ? '생성 중...' : '생성하기'}
+              </button>
+              <button 
+                type="button" 
+                onClick={handleSave}
+                style={{ 
+                  padding: '6px 18px',
+                  border: '1px solid #ccc',
+                  borderRadius: 4,
+                  background: '#fff',
+                  cursor: 'pointer'
+                }}
+              >
+                저장
+              </button>
             </div>
           </div>
         </div>
@@ -160,10 +192,25 @@ function BookGeneration() {
         <div style={{ marginTop: 32 }}>
           {bookList.map((book) => (
             <div key={book.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', border: '1px solid #bbb', padding: '12px 16px', borderRadius: '8px', background: '#fafbfc' }}>
-              <span style={{ fontWeight: 500 }}>{book.title}</span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                {book.imageUrl && (
+                  <img src={book.imageUrl} alt={book.title} style={thumbStyle} />
+                )}
+                <span style={{ fontWeight: 500 }}>{book.title}</span>
+              </div>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => setDescPopup({ open: true, desc: book.desc || '책 설명이 없습니다.' })} style={{ padding: '4px 16px', background: '#fff', border: '1px solid #2563eb', color: '#2563eb', borderRadius: 4, cursor: 'pointer' }}>책 설명</button>
-                <button onClick={() => handleDelete(book.id)} style={{ padding: '4px 16px' }}>삭제</button>
+                <button 
+                  onClick={() => setDescPopup({ open: true, desc: book.content || '책 설명이 없습니다.' })} 
+                  style={{ padding: '4px 16px', background: '#fff', border: '1px solid #2563eb', color: '#2563eb', borderRadius: 4, cursor: 'pointer' }}
+                >
+                  책 설명
+                </button>
+                <button 
+                  onClick={() => handleDelete(book.id)} 
+                  style={{ padding: '4px 16px', background: '#fff', border: '1px solid #dc2626', color: '#dc2626', borderRadius: 4, cursor: 'pointer' }}
+                >
+                  삭제
+                </button>
               </div>
             </div>
           ))}
@@ -179,91 +226,6 @@ function BookGeneration() {
               <div style={{ marginBottom: 24, color: '#333', fontSize: 16 }}>{descPopup.desc}</div>
               <button onClick={() => setDescPopup({ open: false, desc: '' })} style={{ padding: '8px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>닫기</button>
             </div>
-=======
-    <div style={{ maxWidth: 700, margin: '40px auto', border: '2px solid #357', borderRadius: '20px', padding: 24, background: '#fff' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: 24 }}>BOOK COVER GENERATE</h1>
-
-      <div style={{ display: 'flex', gap: 24 }}>
-        {/* COVER 영역 */}
-        <div style={{ flex: 1 }}>
-          <div style={coverStyle}>
-            {bookInfo.imageUrl ? (
-              <img src={bookInfo.imageUrl} alt="book cover" style={{ maxHeight: '100%' }} />
-            ) : (
-              'COVER'
-            )}
-          </div>
-        </div>
-
-        {/* info 입력 영역 */}
-        <div style={{ flex: 1, borderLeft: '2px solid #eee', paddingLeft: 24 }}>
-          <div style={{ marginBottom: 12, fontWeight: 'bold' }}>info</div>
-          <div style={{ marginBottom: 8 }}>
-            <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>title</label>
-            <input
-              type="text"
-              name="title"
-              value={bookInfo.title}
-              onChange={handleChange}
-              style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
-            />
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>content</label>
-            <textarea
-              name="content"
-              value={bookInfo.content}
-              onChange={handleChange}
-              style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
-            />
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              type="button"
-              onClick={handleGenerate}
-              style={{ padding: '6px 18px' }}
-              disabled={generating}
-            >
-              {generating ? 'generating...' : 'generate'}
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              style={{ padding: '6px 18px' }}
-            >
-              save
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 리스트 헤더 + 리프레시 버튼 */}
-      <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={loadBooks} style={{ fontSize: 12, padding: '4px 10px' }}>🔄 refresh</button>
-        <div style={{ fontWeight: 'bold' }}>Book List</div>
-      </div>
-
-      {/* BOOK LIST */}
-      <div style={{ marginTop: 16 }}>
-        {bookList.map((book) => (
-          <div key={book.id} style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 12,
-            border: '1px solid #bbb',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            background: '#fafbfc'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              {book.imageUrl && <img src={book.imageUrl} alt="thumb" style={thumbStyle} />}
-              <span style={{ fontWeight: 500 }}>{book.title}</span>
-            </div>
-            <button onClick={() => handleDelete(book.id)} style={{ padding: '4px 16px' }}>
-              delete
-            </button>
->>>>>>> cover-image
           </div>
         )}
       </div>

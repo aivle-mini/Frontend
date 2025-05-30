@@ -46,6 +46,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import BookList from './pages/BookList';
 import BookGeneration from './pages/BookGeneration';
+import BookInformation from './pages/BookInformation';
 import './App.css';
 
 function App() {
@@ -91,6 +92,7 @@ function AppContent() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/books" element={<BookList />} />
+          <Route path="/books/:id" element={<BookInformation />} />
           <Route path="/generate" element={<BookGeneration />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
