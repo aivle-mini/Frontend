@@ -85,7 +85,7 @@ function BookGeneration() {
               />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>목록</label>
+              <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>설명</label>
               <textarea style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}></textarea>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
