@@ -1,37 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { bookService } from '../services/bookService';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/authService';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function BookGeneration() {
+  const { id } = useParams();  // URL에서 책 ID를 가져옴
   const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
   const [bookInfo, setBookInfo] = useState({
     title: '',
     content: '',
-    imageUrl: null
+    imageUrl: null,
+    userEmail: authService.getCurrentUser()?.email || ''
   });
   const [generating, setGenerating] = useState(false);
-  const [descPopup, setDescPopup] = useState({ open: false, desc: '' });
-  const [bookList, setBookList] = useState([]);
+  const isEditMode = !!id;  // id가 있으면 수정 모드
 
+  // 수정 모드일 때 기존 책 정보 불러오기
   useEffect(() => {
-    loadBooks();
-  }, []);
-
-  const loadBooks = async () => {
-    try {
-      const books = await bookService.getBooks();
-      setBookList(books);
-    } catch (error) {
-      console.error('책 목록 로딩 중 오류:', error);
+    if (isEditMode) {
+      loadBookData();
     }
-  };
+  }, [id]);
 
-  const handleDelete = async (id) => {
+  const loadBookData = async () => {
     try {
-      await bookService.deleteBook(id);
-      await loadBooks();
+      const book = await bookService.getBookById(id);
+      setBookInfo({
+        title: book.title,
+        content: book.content,
+        imageUrl: book.imageUrl,
+        userEmail: book.user.email
+      });
     } catch (error) {
-      console.error('책 삭제 중 오류:', error);
+      console.error('책 정보 로딩 중 오류:', error);
+      navigate('/books');  // 에러 시 목록으로 이동
     }
   };
 
@@ -61,29 +66,44 @@ function BookGeneration() {
 
   const handleSave = async () => {
     try {
-      const bookToSave = {
-        ...bookInfo,
-        id: Date.now()
-      };
-      await bookService.saveBook(bookToSave);
-      await loadBooks();
+      if (isEditMode) {
+        await bookService.updateBook(id, bookInfo);
+      } else {
+        await bookService.saveBook(bookInfo);
+      }
+      navigate('/books');
     } catch (error) {
-      console.error('책 저장 중 오류:', error);
+      console.error(isEditMode ? '책 수정 중 오류:' : '책 저장 중 오류:', error);
     }
   };
 
   const coverStyle = {
     width: '100%',
-    height: '250px',
+    height: '350px',
     background: isDarkMode ? '#1a1a1a' : '#eee',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '2rem',
     border: `1px solid ${isDarkMode ? '#4a5568' : '#bbb'}`,
-    borderRadius: '8px',
+    borderRadius: '12px',
     overflow: 'hidden',
-    color: isDarkMode ? '#e5e7eb' : '#1a1a1a'
+    color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
+    position: 'relative',
+    transition: 'all 0.3s ease'
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '12px 16px',
+    borderRadius: '8px',
+    border: `1px solid ${isDarkMode ? '#4a5568' : '#e2e8f0'}`,
+    background: isDarkMode ? '#1a1a1a' : '#fff',
+    color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
+    fontSize: '16px',
+    transition: 'all 0.2s ease',
+    outline: 'none',
+    marginRight: '16px'
   };
 
   const thumbStyle = {
@@ -97,25 +117,28 @@ function BookGeneration() {
 
   return (
     <div style={{
-      background: isDarkMode ? '#1a1a1a' : '#f8fafc',
+      background: isDarkMode ? '#0f172a' : '#f8fafc',
       minHeight: 'calc(100vh - 96px)',
-      paddingBottom: '40px'
+      paddingBottom: '40px',
+      transition: 'all 0.3s ease'
     }}>
       <div style={{ 
         maxWidth: '940px', 
         margin: '40px auto', 
-        border: `2px solid ${isDarkMode ? '#4a5568' : '#357'}`, 
+        border: `2px solid ${isDarkMode ? '#334155' : '#357'}`, 
         borderRadius: '20px', 
         padding: 32, 
-        background: isDarkMode ? '#2d2d2d' : '#fff' 
+        background: isDarkMode ? '#1e293b' : '#fff',
+        transition: 'all 0.3s ease'
       }}>
         <h1 style={{ 
           textAlign: 'center', 
           marginBottom: 32,
           color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
           fontSize: '32px'
-        }}>북 커버 생성</h1>
-        <div style={{ display: 'flex', gap: 24 }}>
+        }}>{isEditMode ? '책 수정' : '북 커버 생성'}</h1>
+        
+        <div style={{ display: 'flex', gap: 32 }}>
           {/* COVER 영역 */}
           <div style={{ flex: 1 }}>
             <div style={coverStyle}>
@@ -123,151 +146,142 @@ function BookGeneration() {
                 <img 
                   src={bookInfo.imageUrl} 
                   alt="생성된 책 표지" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease'
+                  }}
                 />
               ) : (
-                'COVER'
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '16px',
+                  color: isDarkMode ? '#9ca3af' : '#64748b'
+                }}>
+                  <span style={{ fontSize: '48px' }}>📚</span>
+                  <span style={{ fontSize: '18px' }}>커버 이미지 미리보기</span>
+                </div>
               )}
             </div>
           </div>
+
           {/* info 입력 영역 */}
           <div style={{ 
             flex: 1, 
             borderLeft: `2px solid ${isDarkMode ? '#4a5568' : '#eee'}`, 
-            paddingLeft: 24,
+            paddingLeft: 32,
+            paddingRight: 16,
             color: isDarkMode ? '#e5e7eb' : '#1a1a1a'
           }}>
-            <div style={{ marginBottom: 12, fontWeight: 'bold' }}>도서 정보</div>
-            <div style={{ marginBottom: 8 }}>
-              <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>제목</label>
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ 
+                display: 'block', 
+                fontSize: 16, 
+                marginBottom: 8,
+                color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
+                fontWeight: '600'
+              }}>
+                책 제목
+              </label>
               <input 
                 type="text" 
                 name="title"
                 value={bookInfo.title}
                 onChange={handleChange}
-                style={{ 
-                  width: '100%', 
-                  padding: 6, 
-                  borderRadius: 4, 
-                  border: `1px solid ${isDarkMode ? '#4a5568' : '#ccc'}`,
-                  background: isDarkMode ? '#1a1a1a' : '#fff',
-                  color: isDarkMode ? '#e5e7eb' : '#1a1a1a'
-                }} 
+                placeholder="책 제목을 입력하세요"
+                style={{
+                  ...inputStyle,
+                  height: '48px'
+                }}
               />
             </div>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>설명</label>
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ 
+                display: 'block', 
+                fontSize: 16, 
+                marginBottom: 8,
+                color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
+                fontWeight: '600'
+              }}>
+                책 내용
+              </label>
               <textarea 
                 name="content"
                 value={bookInfo.content}
                 onChange={handleChange}
-                style={{ 
-                  width: '100%', 
-                  height: 60, 
-                  padding: 6, 
-                  borderRadius: 4, 
-                  border: `1px solid ${isDarkMode ? '#4a5568' : '#ccc'}`,
-                  background: isDarkMode ? '#1a1a1a' : '#fff',
-                  color: isDarkMode ? '#e5e7eb' : '#1a1a1a'
+                placeholder="책 내용을 입력하세요."
+                style={{
+                  ...inputStyle,
+                  height: '160px',
+                  resize: 'none',
+                  lineHeight: '1.5'
                 }}
               />
+              <p style={{ 
+                fontSize: '14px', 
+                color: isDarkMode ? '#9ca3af' : '#64748b',
+                marginTop: '8px' 
+              }}>
+                * 제목과 내용을 참고하여 AI 이미지를 생성합니다.
+              </p>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 12, marginTop: 32 }}>
               <button 
                 type="button" 
                 onClick={handleGenerate}
                 disabled={generating}
                 style={{ 
-                  padding: '6px 18px', 
-                  background: generating ? (isDarkMode ? '#1d4ed8' : '#ccc') : (isDarkMode ? '#3b82f6' : '#2563eb'), 
+                  flex: 2,
+                  padding: '14px', 
+                  background: generating ? (isDarkMode ? '#1d4ed8' : '#93c5fd') : (isDarkMode ? '#3b82f6' : '#2563eb'), 
                   color: '#fff', 
                   border: 'none', 
-                  borderRadius: 4,
-                  cursor: generating ? 'not-allowed' : 'pointer'
+                  borderRadius: 8,
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: generating ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
                 }}
               >
-                {generating ? '생성 중...' : '생성하기'}
+                {generating ? (
+                  <>
+                    <span style={{ fontSize: '18px' }}>🎨</span>
+                    생성 중...
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontSize: '18px' }}>✨</span>
+                    AI 커버 {isEditMode ? '재생성' : '생성'}하기
+                  </>
+                )}
               </button>
               <button 
                 type="button" 
                 onClick={handleSave}
                 style={{ 
-                  padding: '6px 18px',
-                  border: `1px solid ${isDarkMode ? '#4a5568' : '#ccc'}`,
-                  borderRadius: 4,
+                  flex: 1,
+                  padding: '14px',
+                  border: `1.5px solid ${isDarkMode ? '#4a5568' : '#e2e8f0'}`,
+                  borderRadius: 8,
                   background: isDarkMode ? '#2d2d2d' : '#fff',
                   color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
-                  cursor: 'pointer'
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
                 }}
               >
-                저장
+                {isEditMode ? '수정' : '저장'}
               </button>
             </div>
           </div>
-        </div>
-        {/* 리스트 헤더 + 리프레시 버튼 */}
-        <div style={{ 
-          marginTop: 40, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          color: isDarkMode ? '#e5e7eb' : '#1a1a1a'
-        }}>
-          <button 
-            onClick={loadBooks} 
-            style={{ 
-              fontSize: 12, 
-              padding: '4px 10px',
-              background: isDarkMode ? '#2d2d2d' : '#fff',
-              border: `1px solid ${isDarkMode ? '#4a5568' : '#ccc'}`,
-              borderRadius: 4,
-              color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
-              cursor: 'pointer'
-            }}
-          >
-            🔄 refresh
-          </button>
-          <div style={{ fontWeight: 'bold' }}>Book List</div>
-        </div>
-        {/* BOOK LIST 하단 영역 */}
-        <div style={{ marginTop: 32 }}>
-          {bookList.map((book) => (
-            <div 
-              key={book.id} 
-              style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                marginBottom: '12px', 
-                border: `1px solid ${isDarkMode ? '#4a5568' : '#bbb'}`, 
-                padding: '12px 16px', 
-                borderRadius: '8px', 
-                background: isDarkMode ? '#1a1a1a' : '#fafbfc',
-                color: isDarkMode ? '#e5e7eb' : '#1a1a1a'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <img src={book.imageUrl} alt={book.title} style={thumbStyle} />
-                <div>
-                  <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{book.title}</div>
-                  <div style={{ fontSize: 14, color: isDarkMode ? '#9ca3af' : '#666' }}>{book.content}</div>
-                </div>
-              </div>
-              <button 
-                onClick={() => handleDelete(book.id)}
-                style={{ 
-                  padding: '4px 12px',
-                  background: isDarkMode ? '#dc2626' : '#ef4444',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 4,
-                  cursor: 'pointer'
-                }}
-              >
-                삭제
-              </button>
-            </div>
-          ))}
         </div>
       </div>
     </div>
