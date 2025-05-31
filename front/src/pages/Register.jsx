@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { useTheme } from '../contexts/ThemeContext';
 
 function Register() {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -40,7 +42,6 @@ function Register() {
 
     try {
       await authService.register(email, username, password);
-      // 회원가입 성공 후 로그인 페이지로 이동
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -49,17 +50,56 @@ function Register() {
     }
   };
 
+  const inputStyle = {
+    width: '100%',
+    padding: '12px',
+    marginBottom: '16px',
+    border: `1px solid ${isDarkMode ? '#4a5568' : '#e2e8f0'}`,
+    borderRadius: '8px',
+    fontSize: '16px',
+    background: isDarkMode ? '#1a1a1a' : '#fff',
+    color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
+  };
+
+  const buttonStyle = {
+    width: '100%',
+    padding: '12px',
+    background: isDarkMode ? '#3b82f6' : '#2563eb',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'background 0.2s',
+  };
+
   return (
-    <div className="max-w-sm mx-auto mt-10 p-6 border rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-center">회원가입</h1>
-      <form onSubmit={handleSubmit} className="space-y-3">
+    <div style={{
+      maxWidth: '400px',
+      margin: '60px auto',
+      padding: '32px',
+      borderRadius: '16px',
+      boxShadow: isDarkMode ? '0 4px 6px rgba(0, 0, 0, 0.2)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
+      background: isDarkMode ? '#2d2d2d' : '#ffffff',
+      color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
+    }}>
+      <h1 style={{
+        fontSize: '28px',
+        fontWeight: 'bold',
+        marginBottom: '24px',
+        textAlign: 'center',
+        color: isDarkMode ? '#e5e7eb' : '#1a1a1a',
+      }}>회원가입</h1>
+      
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
           name="email"
           placeholder="이메일"
           value={formData.email}
           onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
+          style={inputStyle}
         />
         <input
           type="text"
@@ -67,7 +107,7 @@ function Register() {
           placeholder="아이디"
           value={formData.username}
           onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
+          style={inputStyle}
         />
         <input
           type="password"
@@ -75,7 +115,7 @@ function Register() {
           placeholder="비밀번호"
           value={formData.password}
           onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
+          style={inputStyle}
         />
         <input
           type="password"
@@ -83,19 +123,47 @@ function Register() {
           placeholder="비밀번호 확인"
           value={formData.confirmPassword}
           onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
+          style={inputStyle}
         />
-        {error && <div className="text-red-500 text-sm">{error}</div>}
+        
+        {error && (
+          <div style={{
+            color: '#ef4444',
+            marginBottom: '16px',
+            fontSize: '14px',
+            textAlign: 'center'
+          }}>
+            {error}
+          </div>
+        )}
+        
         <button
           type="submit"
-          className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          style={{
+            ...buttonStyle,
+            background: loading ? (isDarkMode ? '#1d4ed8' : '#3b82f6') : (isDarkMode ? '#3b82f6' : '#2563eb'),
+          }}
           disabled={loading}
         >
           {loading ? '가입 중...' : '회원가입'}
         </button>
       </form>
-      <div className="text-center mt-4">
-        <button onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
+      
+      <div style={{
+        marginTop: '24px',
+        textAlign: 'center',
+      }}>
+        <button 
+          onClick={() => navigate('/')} 
+          style={{
+            color: isDarkMode ? '#60a5fa' : '#2563eb',
+            textDecoration: 'none',
+            fontSize: '14px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
           이미 계정이 있으신가요? 로그인
         </button>
       </div>
