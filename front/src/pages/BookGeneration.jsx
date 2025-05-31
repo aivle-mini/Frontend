@@ -31,17 +31,17 @@ function BookGeneration() {
     }
   };
 
-  // COVER 이미지(임시)
   const coverStyle = {
     width: '100%',
-    height: '250px',
-    background: '#eee',
+    height: '400px',
+    background: 'var(--bg-secondary)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '2rem',
-    border: '1px solid #bbb',
+    border: '1px solid var(--border-color)',
     borderRadius: '8px',
+    color: 'var(--text-secondary)'
   };
 
   const handleChange = (e) => {
@@ -58,7 +58,7 @@ function BookGeneration() {
     try {
       const generatedBook = await bookService.generateBook(bookInfo);
       await bookService.saveBook(generatedBook);
-      await loadBooks(); // 책 목록 새로고침
+      await loadBooks();
     } catch (error) {
       console.error('책 생성 중 오류:', error);
     } finally {
@@ -69,72 +69,119 @@ function BookGeneration() {
   const handleSave = async () => {
     try {
       await bookService.saveBook(bookInfo);
-      await loadBooks(); // 책 목록 새로고침
+      await loadBooks();
     } catch (error) {
       console.error('책 저장 중 오류:', error);
     }
   };
 
   return (
-    <div>
-      {/* 상단 네비게이션 바 - 가로 정렬, 그림자, 여백, 심플 스타일 */}
-      <nav style={{
-        width: 700,
-        margin: '0 auto',
-        background: '#fff',
-        borderBottom: '1.5px solid #357',
-        boxShadow: '0 2px 8px rgba(53,87,119,0.06)',
-        padding: '0 40px',
-        height: 60,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        fontWeight: 600,
-        fontSize: 18,
-        letterSpacing: 1,
-        marginBottom: 36
-      }}>
-        <div style={{ display: 'flex', gap: 36 }}>
-          <a href="/books" style={{ color: '#357', textDecoration: 'none', padding: '8px 0', borderBottom: '2px solid transparent' }}>책 목록</a>
-          <a href="/generate" style={{ color: '#357', textDecoration: 'none', padding: '8px 0', borderBottom: '2px solid transparent' }}>책 생성</a>
-        </div>
-        <a href="/login" style={{ color: '#2563eb', textDecoration: 'none', padding: '8px 0', borderBottom: '2px solid transparent' }}>로그인</a>
-      </nav>
-      <div style={{ maxWidth: 700, margin: '40px auto', border: '2px solid #357', borderRadius: '20px', padding: 24, background: '#fff' }}>
-        <h1 style={{ textAlign: 'center', marginBottom: 24 }}>북 커버 생성</h1>
-        <div style={{ display: 'flex', gap: 24 }}>
-          {/* COVER 영역 */}
-          <div style={{ flex: 1 }}>
+    <div style={{ maxWidth: 1100, margin: '40px auto', padding: '0 16px' }}>
+      <h1 style={{ textAlign: 'left', fontSize: 32, fontWeight: 700, marginBottom: 32 }}>북 커버 생성</h1>
+      <div className="card">
+        <div style={{ display: 'flex', gap: '2rem' }}>
+          <div style={{ flex: 1.2 }}>
             <div style={coverStyle}>COVER</div>
           </div>
-          {/* info 입력 영역 */}
-          <div style={{ flex: 1, borderLeft: '2px solid #eee', paddingLeft: 24 }}>
-            <div style={{ marginBottom: 12, fontWeight: 'bold' }}>도서 정보</div>
-            <div style={{ marginBottom: 8 }}>
-              <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>제목</label>
+          <div style={{ 
+            flex: 1,
+            borderLeft: '1px solid var(--border-color)',
+            paddingLeft: '2rem'
+          }}>
+            <div style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '1.25rem', color: 'var(--text-primary)' }}>도서 정보</div>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>제목</label>
               <input 
-                type="text" 
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                style={{ width: '100%', padding: 6, borderRadius: 4, border: '1px solid #ccc' }} 
+                type="text"
+                name="title"
+                value={bookInfo.title}
+                onChange={handleChange}
+                className="input"
+                placeholder="책 제목을 입력하세요"
               />
             </div>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>설명</label>
-              <textarea style={{ width: '100%', height: 60, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}></textarea>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>설명</label>
+              <textarea 
+                name="content"
+                value={bookInfo.content}
+                onChange={handleChange}
+                className="input"
+                style={{ height: '160px', resize: 'vertical' }}
+                placeholder="책에 대한 설명을 입력하세요"
+              />
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button type="button" onClick={handleSubmit} style={{ padding: '6px 18px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 4 }}>생성하기</button>
-              <button type="button" style={{ padding: '6px 18px' }}>저장</button>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button 
+                type="button" 
+                onClick={handleSubmit} 
+                className="button"
+                disabled={generating}
+                style={{ flex: 1 }}
+              >
+                {generating ? '생성 중...' : '생성하기'}
+              </button>
+              <button 
+                type="button" 
+                onClick={handleSave}
+                className="button"
+                style={{ 
+                  flex: 1,
+                  backgroundColor: 'var(--bg-secondary)', 
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-color)'
+                }}
+              >
+                저장
+              </button>
             </div>
           </div>
         </div>
-        {/* BOOK LIST 하단 영역 */}
-        <div style={{ marginTop: 32 }}>
+      </div>
+      
+      <div style={{ marginTop: '3rem' }}>
+        <h2 style={{ fontSize: 24, fontWeight: 600, marginBottom: '1.5rem', color: 'var(--text-primary)' }}>생성된 책 목록</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
           {bookList.map((book) => (
-            <div key={book.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', border: '1px solid #bbb', padding: '12px 16px', borderRadius: '8px', background: '#fafbfc' }}>
-              <span style={{ fontWeight: 500 }}>{book.title}</span>
-              <button onClick={() => handleDelete(book.id)} style={{ padding: '4px 16px' }}>삭제</button>
+            <div key={book.id} className="card" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              margin: 0
+            }}>
+              <div style={{ 
+                aspectRatio: '3/4',
+                background: 'var(--bg-secondary)',
+                borderRadius: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-secondary)',
+                fontSize: '1.25rem',
+                border: '1px solid var(--border-color)'
+              }}>
+                COVER
+              </div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ 
+                  fontSize: '1.125rem',
+                  fontWeight: 500,
+                  marginBottom: '0.5rem',
+                  color: 'var(--text-primary)'
+                }}>
+                  {book.title}
+                </h3>
+                <button 
+                  onClick={() => handleDelete(book.id)} 
+                  className="button"
+                  style={{ 
+                    width: '100%',
+                    backgroundColor: '#ef4444'
+                  }}
+                >
+                  삭제
+                </button>
+              </div>
             </div>
           ))}
         </div>

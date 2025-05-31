@@ -1,47 +1,5 @@
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-// import { AuthProvider } from './contexts/AuthContext';
-// import Login from './pages/Login';
-// import BookList from './pages/BookList';
-// import BookGeneration from './pages/BookGeneration';
-
-// import './App.css';
-
-// function App() {
-//   const location = useLocation();
-//   const isBookGenerationPage = location.pathname === '/generate';
-//   return (
-//     <AuthProvider>
-//       <Router>
-//         <div className="App">
-//           {!isBookGenerationPage && (
-//           <nav>
-//             <ul>
-//               <li><a href="/books">책 목록</a></li>
-//               <li><a href="/generate">책 생성</a></li>
-//               <li><a href="/login">로그인</a></li>
-//             </ul>
-//           </nav>
-//           )}
-//           <main>
-//             <Routes>
-//               <Route path="/login" element={<Login />} />
-//               <Route path="/books" element={<BookList />} />
-//               <Route path="/generate" element={<BookGeneration />} />
-//               <Route path="/" element={<Navigate to="/login" replace />} />
-//             </Routes>
-//           </main>
-//         </div>
-//       </Router>
-//     </AuthProvider>
-//   );
-// }
-
-// export default App;
-
-
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -49,23 +7,33 @@ import BookList from './pages/BookList';
 import BookGeneration from './pages/BookGeneration';
 import './App.css';
 
+function Header() {
+  return (
+    <nav className="header">
+      <div className="header-content">
+        <div className="nav-links">
+          <Link to="/books">책 목록</Link>
+          <Link to="/generate">책 생성</Link>
+        </div>
+        <div className="auth-links">
+          <Link to="/login">로그인</Link>
+          <Link to="/register">회원가입</Link>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="App">
-          <nav>
-            <ul>
-              <li><a href="/books">책 목록</a></li>
-              <li><a href="/generate">책 생성</a></li>
-              <li><a href="/login">로그인</a></li>
-              <li><a href="/register">회원가입</a></li> {/* ✅ 추가 */}
-            </ul>
-          </nav>
-          <main>
+          <Header />
+          <main className="main-content">
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} /> {/* ✅ 추가 */}
+              <Route path="/register" element={<Register />} />
               <Route path="/books" element={<BookList />} />
               <Route path="/generate" element={<BookGeneration />} />
               <Route path="/" element={<Navigate to="/books" replace />} />

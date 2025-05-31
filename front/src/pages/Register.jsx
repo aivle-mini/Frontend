@@ -40,7 +40,6 @@ function Register() {
 
     try {
       await authService.register(email, username, password);
-      // 회원가입 성공 후 로그인 페이지로 이동
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -50,54 +49,100 @@ function Register() {
   };
 
   return (
-    <div className="max-w-sm mx-auto mt-10 p-6 border rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-center">회원가입</h1>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          type="email"
-          name="email"
-          placeholder="이메일"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-        />
-        <input
-          type="text"
-          name="username"
-          placeholder="아이디"
-          value={formData.username}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="비밀번호"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-        />
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="비밀번호 확인"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border rounded"
-        />
-        {error && <div className="text-red-500 text-sm">{error}</div>}
-        <button
-          type="submit"
-          className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          disabled={loading}
-        >
-          {loading ? '가입 중...' : '회원가입'}
-        </button>
-      </form>
-      <div className="text-center mt-4">
-        <button onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
-          이미 계정이 있으신가요? 로그인
-        </button>
+    <div style={{ maxWidth: 1100, margin: '40px auto', padding: '0 16px' }}>
+      <h1 style={{ textAlign: 'left', fontSize: 32, fontWeight: 700, marginBottom: 32 }}>회원가입</h1>
+      <div className="card" style={{ maxWidth: 480, margin: '0 auto' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+              이메일
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="input"
+              placeholder="example@email.com"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+              아이디
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className="input"
+              placeholder="사용할 아이디를 입력하세요"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+              비밀번호
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="input"
+              placeholder="비밀번호를 입력하세요"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+              비밀번호 확인
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="input"
+              placeholder="비밀번호를 다시 입력하세요"
+            />
+          </div>
+          
+          {error && (
+            <div style={{ 
+              padding: '0.75rem', 
+              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+              color: '#ef4444',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="button"
+            disabled={loading}
+            style={{ marginTop: '1rem' }}
+          >
+            {loading ? '가입 중...' : '회원가입'}
+          </button>
+
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <button 
+              type="button" 
+              onClick={() => navigate('/login')}
+              style={{ 
+                color: 'var(--primary-color)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.875rem'
+              }}
+            >
+              이미 계정이 있으신가요? 로그인
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
