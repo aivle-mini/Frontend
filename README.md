@@ -238,7 +238,6 @@ export const authService = {
 ```
 </details>
 
----
 
 ### bookService.js
 - 도서 생성, 조회, 수정, 삭제 및 OpenAI API를 활용한 커버 이미지 생성 기능을 포함합니다.
