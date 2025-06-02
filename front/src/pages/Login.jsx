@@ -8,23 +8,33 @@ function Login() {
   const { isDarkMode } = useTheme();
 
   const [formData, setFormData] = useState({
-    username: '',   // API 스펙: username 사용
+    username: '',
     password: ''
   });
   const [errorMsg, setErrorMsg] = useState('');
+  const [emailError, setEmailError] = useState('');
+
+  /** 이메일 유효성 검사 */
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   /** 로그인 요청 */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg('');           // 에러 초기화
+    setErrorMsg('');
+    setEmailError('');
+
+    if (!validateEmail(formData.username)) {
+      setEmailError('유효한 이메일 형식이 아닙니다.');
+      return;
+    }
 
     try {
       await authService.login(formData.username, formData.password);
-
-      // 도서 목록 페이지로 이동
       navigate('/books');
     } catch (err) {
-      // ❌ 실패: 메시지 표시
       setErrorMsg(err.message);
     }
   };
@@ -33,6 +43,9 @@ function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'username') {
+      setEmailError('');
+    }
   };
 
   /** 회원가입 페이지 이동 */
@@ -93,15 +106,15 @@ function Login() {
           }}>로그인</h1>
           <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 18 }}>
             <input
-              type="text"
+              type="email"
               name="username"
-              placeholder="아이디"
+              placeholder="이메일 입력"
               value={formData.username}
               onChange={handleChange}
               style={{ 
                 padding: '12px', 
                 borderRadius: 8, 
-                border: `1px solid ${isDarkMode ? '#4a5568' : '#cfd8dc'}`,
+                border: `1px solid ${emailError ? '#ef4444' : isDarkMode ? '#4a5568' : '#cfd8dc'}`,
                 fontSize: 16, 
                 marginBottom: 4,
                 background: isDarkMode ? '#1a1a1a' : '#fff',
@@ -109,6 +122,16 @@ function Login() {
               }}
               required
             />
+            {emailError && (
+              <div style={{ 
+                color: '#ef4444', 
+                fontSize: 12, 
+                marginTop: -2,
+                marginBottom: 4 
+              }}>
+                {emailError}
+              </div>
+            )}
             <input
               type="password"
               name="password"
