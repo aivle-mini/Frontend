@@ -131,17 +131,17 @@ Frontend/
 ### 도서 목록 확인
 - 도서 목록과 특정 도서의 상세 내용을 확인하고 수정할 수 있습니다.
 <p float="left">
-  <img src="https://github.com/user-attachments/assets/cc79275e-7416-4e9f-a9de-c286db703954" width="500" height="400"/>
-  <img src="https://github.com/user-attachments/assets/6bf2644d-b1d1-4b00-a7e6-9a3b17430cce" width="500" height="400"/>
+  <img src="https://github.com/user-attachments/assets/db95de7b-2f25-4ae8-9f17-8e0375b678a8" width="500" height="400"/>
+  <img src="https://github.com/user-attachments/assets/43a5e597-042f-40e8-b6cf-1e3eec0b6404" width="500" height="400"/>
 </p>
 
 ### 내용 수정
 - 제목, 내용, 커버를 수정할 수 있습니다. 생성 버튼을 여러번 클릭하여 새로운 표지를 만들 수 있습니다.
-<p><img src="https://github.com/user-attachments/assets/5ccce512-30d3-4828-9e10-aee048607c24" width="500" height="400"/></p>
+<p><img src="https://github.com/user-attachments/assets/7d3c8c01-dc3a-4b29-bea8-462b9b202b85" width="500" height="400"/></p>
 
 ### 북 커버 생성
 - 제목과 내용을 입력한 후 생성 버튼으로 생성합니다.
 <p float="left">
-  <img src="https://github.com/user-attachments/assets/a78287a7-18a8-4cdf-9c26-99f7127f1764" width="500" height="400"/>
-  <img src="https://github.com/user-attachments/assets/d0ac5f1e-791e-4724-bf7e-f1178d0ca64c" width="500" height="400"/>
+  <img src="https://github.com/user-attachments/assets/101ee0c4-0e58-4df2-be66-6af565f76ce0" width="500" height="400"/>
+  <img src="https://github.com/user-attachments/assets/98a5c14c-a0d0-4f65-9147-7671f847bbd5" width="500" height="400"/>
 </p>
