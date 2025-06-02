@@ -8,7 +8,7 @@
 
 - .env 파일을 작성하셔야 합니다.
   ```bash
-VITE_OPENAI_API_KEY=sk-proj-MwbH...
+VITE_OPENAI_API_KEY=yourkey.
 ```
 
 ### 설치 방법
