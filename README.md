@@ -93,31 +93,6 @@ Frontend/
 │   └── .gitignore               # Git에서 무시할 파일 목록
 
 ```
-
-### 주요 디렉토리 설명
-- `components/common`: 버튼, 입력창, 카드 등 재사용 가능한 UI 컴포넌트
-- `components/layout`: 헤더, 푸터, 사이드바 등 레이아웃 관련 컴포넌트
-- `components/features`: 특정 기능이나 도메인과 관련된 복잡한 컴포넌트
-- `contexts`: 전역 상태 관리를 위한 Context API 관련 파일들
-- `hooks`: 재사용 가능한 로직을 분리한 커스텀 훅들
-- `services/api`: axios 인스턴스 설정 및 API 엔드포인트 호출 함수들
-- `services/utils`: 날짜 포맷팅, 데이터 변환 등 유틸리티 함수
-
-## 리소스 구조
-
-- `assets/`: 프로젝트에서 사용되는 이미지, 폰트 등의 정적 리소스
-- `public/`: 빌드 시 그대로 복사되는 정적 파일들
-- `index.css`: 전역 스타일 정의
-- `App.css`: App 컴포넌트 관련 스타일
-
-### 주요 파일 설명
-- `vite.config.js`: Vite 빌드 도구 설정 파일, 프로젝트의 개발 서버 및 빌드 설정 관리
-- `package.json`: 프로젝트 의존성 및 스크립트 정의
-- `index.html`: 애플리케이션의 진입점, React 앱이 마운트되는 기본 HTML 템플릿
-- `src/main.jsx`: React 애플리케이션의 실제 진입점, 루트 컴포넌트 렌더링
-- `src/App.jsx`: 라우팅 설정 및 전역 레이아웃 관리
-- `src/services/api.js`: 백엔드 API 통신을 위한 설정 및 인터페이스
-
   
 ## 📌 주요 기능 스크린샷
 ### 로그인
