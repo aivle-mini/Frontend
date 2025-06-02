@@ -93,6 +93,34 @@ Frontend/
 │   └── .gitignore               # Git에서 무시할 파일 목록
 
 ```
+# 📌 세부 구현 사항
+
+### authService.js
+- 사용자 인증 및 계정 관련 기능을 담당합니다.
+- 로그인 시 사용자 정보를 `localStorage`에 저장하며, 인증 여부 확인 및 로그아웃 기능도 제공합니다.
+- 주요 메서드:
+  - `login(username, password)`: 사용자 로그인 요청 (백엔드의 `/v1/users/login` 엔드포인트와 통신)
+  - `register(email, username, password)`: 사용자 회원가입 요청
+  - `logout()`: 저장된 사용자 정보 제거
+  - `isAuthenticated()`: 로그인 여부 확인
+  - `getCurrentUser()`: 현재 로그인된 사용자 정보 반환
+  - `findPassword(username, email)`: (임시 구현) 저장된 사용자 목록에서 일치하는 사용자 확인
+  - `getUserInfo(userId)`: 특정 사용자 정보 조회
+
+---
+
+### bookService.js
+- 도서 생성, 조회, 수정, 삭제 및 OpenAI API를 활용한 커버 이미지 생성 기능을 포함합니다.
+- RESTful 방식으로 백엔드 API와 통신하며, 프론트에서 사용하는 형식으로 응답 데이터를 변환합니다.
+- 주요 메서드:
+  - `getBooks()`: 모든 도서 목록 조회
+  - `getBookById(id)`: 특정 ID의 도서 조회
+  - `generateBook(bookData)`: OpenAI DALL·E 3 모델을 사용해 책 커버 이미지 생성
+  - `saveBook(bookData)`: 도서 생성 및 저장
+  - `updateBook(id, bookData)`: 도서 정보 수정
+  - `deleteBook(id)`: 도서 삭제
+- 내부적으로 `transformBookData()` 함수를 사용해 백엔드의 snake_case 응답을 camelCase로 변환합니다.
+
   
 ## 📌 주요 기능 스크린샷
 ### 로그인
