@@ -6,6 +6,11 @@
 - Node.js 16.0.0 이상
 - npm 또는 yarn
 
+- .env 파일을 작성하셔야 합니다.
+  ```bash
+VITE_OPENAI_API_KEY=sk-proj-MwbH...
+```
+
 ### 설치 방법
 
 1. 프로젝트 클론
