@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext'; // authService 대신 useAuth 사용
 import { useTheme } from '../contexts/ThemeContext';
 
 function Login() {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
+  const { login } = useAuth(); // AuthContext의 login 함수 사용
 
   const [formData, setFormData] = useState({
     username: '',   // API 스펙: username 사용
@@ -33,7 +34,8 @@ function Login() {
     }
 
     try {
-      await authService.login(formData.username, formData.password);
+      // AuthContext의 login 함수 사용 (상태 업데이트 포함)
+      await login(formData.username, formData.password);
 
       // 도서 목록 페이지로 이동
       navigate('/books');

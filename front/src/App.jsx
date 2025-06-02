@@ -23,11 +23,13 @@ function App() {
   );
 }
 
+
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
   const { isAuthenticated, logout } = useAuth();
+
 
   return (
     <>

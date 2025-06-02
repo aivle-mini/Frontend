@@ -1,16 +1,35 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { flushSync } from 'react-dom';
 import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
-  const [user, setUser] = useState(authService.getCurrentUser());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const user = await authService.getCurrentUser();  
+      if (user) {
+        setUser(user);
+        setIsAuthenticated(true);
+      }
+      setLoading(false);
+    };
+    initAuth();
+  }, []);
 
   const login = async (username, password) => {
     const data = await authService.login(username, password);
-    setIsAuthenticated(true);
-    setUser(data);
+    
+    // flushSync를 사용해서 상태 업데이트를 즉시 반영
+    flushSync(() => {
+      setUser(data);
+      setIsAuthenticated(true);
+    });
+    
     return data;
   };
 
@@ -31,9 +50,10 @@ export const AuthProvider = ({ children }) => {
       user,
       login, 
       logout,
-      updateUser 
+      updateUser,
+      loading
     }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
