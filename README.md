@@ -58,39 +58,40 @@ yarn build
 ```
 Frontend/
 ├── front/
-    ├── src/
-    │   ├── assets/            # 이미지, 폰트 등 정적 리소스
-    │   │   ├── images/        # 이미지 파일들
-    │   │   └── styles/        # 공통 스타일 파일들
-    │   ├── components/        # 재사용 가능한 컴포넌트
-    │   │   ├── common/        # 공통 컴포넌트 (버튼, 입력창 등)
-    │   │   ├── layout/        # 레이아웃 관련 컴포넌트
-    │   │   └── features/      # 특정 기능과 관련된 컴포넌트
-    │   ├── contexts/          # React Context 관련 파일
-    │   │   ├── AuthContext.js     # 인증 관련 컨텍스트
-    │   │   └── ThemeContext.js    # 테마 관련 컨텍스트
-    │   ├── pages/             # 페이지 컴포넌트
-    │   │   ├── Home/             # 홈 페이지 관련 파일
-    │   │   ├── Auth/             # 로그인/회원가입 페이지
-    │   │   └── Profile/          # 프로필 페이지
-    │   ├── services/          # API 통신 및 서비스 로직
-    │   │   ├── api/             # API 호출 관련 파일
-    │   │   └── utils/           # 유틸리티 함수들
-    │   ├── hooks/             # 커스텀 훅
-    │   │   ├── useAuth.js       # 인증 관련 훅
-    │   │   └── useForm.js       # 폼 관련 훅
-    │   ├── App.jsx           # 메인 App 컴포넌트
-    │   ├── App.css           # App 컴포넌트 스타일
-    │   ├── index.css         # 전역 스타일
-    │   └── main.jsx          # 앱 진입점
-    ├── public/               # 정적 파일
-    │   ├── favicon.ico        # 파비콘
-    │   └── robots.txt         # 검색엔진 크롤링 설정
-    ├── index.html            # HTML 템플릿
-    ├── package.json          # 프로젝트 설정 및 의존성
-    ├── .eslintrc.json        # ESLint 설정
-    ├── .env                  # open ai api key가 담긴 파일일
-    └── vite.config.js        # Vite 설정
+│   ├── node_modules/             # 설치된 외부 패키지들 (자동 생성)
+│   ├── public/                   # 정적 파일
+│   │   ├── favicon.ico           # 파비콘
+│   │   └── robots.txt            # 검색엔진 크롤링 설정
+│   ├── src/                      # 소스 코드 루트
+│   │   ├── assets/               # 이미지, 폰트 등 정적 리소스
+│   │   ├── components/           # 재사용 가능한 컴포넌트
+│   │   │   └── PrivateRoute.jsx  # 인증된 사용자만 접근 가능한 라우트
+│   │   ├── contexts/             # React Context 관련 파일
+│   │   │   ├── AuthContext.jsx       # 인증 상태 전역 관리
+│   │   │   └── ThemeContext.jsx      # 다크모드 등 테마 전역 관리
+│   │   ├── pages/                # 주요 페이지 컴포넌트들
+│   │   │   ├── BookGeneration.jsx    # 책 생성 페이지
+│   │   │   ├── BookInformation.jsx   # 책 상세 정보 페이지
+│   │   │   ├── BookList.jsx         # 책 리스트 페이지
+│   │   │   ├── ForgotPassword.jsx   # 비밀번호 재설정 페이지
+│   │   │   ├── Login.jsx            # 로그인 페이지
+│   │   │   └── Register.jsx         # 회원가입 페이지
+│   │   ├── services/             # API 서비스 및 유틸리티
+│   │   │   ├── authService.js        # 로그인, 회원가입 등 인증 관련 API
+│   │   │   └── bookService.js        # 책 관련 API 서비스
+│   │   ├── App.css               # App 컴포넌트 스타일
+│   │   ├── App.jsx               # 루트 App 컴포넌트
+│   │   ├── index.css             # 전역 CSS
+│   │   └── main.jsx              # React 앱의 진입점
+│   ├── .env                      # 환경 변수 파일 (예: OpenAI API 키)
+│   ├── .eslint.config.js         # ESLint 설정
+│   ├── index.html               # HTML 템플릿
+│   ├── package-lock.json        # 의존성 잠금 파일
+│   ├── package.json             # 프로젝트 의존성 및 스크립트
+│   ├── README.md                # 프로젝트 소개 문서
+│   ├── vite.config.js           # Vite 설정 파일
+│   └── .gitignore               # Git에서 무시할 파일 목록
+
 ```
 
 ### 주요 디렉토리 설명
