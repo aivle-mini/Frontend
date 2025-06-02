@@ -106,6 +106,137 @@ Frontend/
   - `getCurrentUser()`: 현재 로그인된 사용자 정보 반환
   - `findPassword(username, email)`: (임시 구현) 저장된 사용자 목록에서 일치하는 사용자 확인
   - `getUserInfo(userId)`: 특정 사용자 정보 조회
+ 
+
+<details>
+<summary> 코드 보기 (authService.js)</summary>
+
+```js
+const API_URL = 'http://localhost:8080/api';
+
+export const authService = {
+  login: async (username, password) => {
+    try {
+      const response = await fetch(`${API_URL}/v1/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          username: username,
+          passwd: password
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || '로그인에 실패했습니다.');
+      }
+
+      const data = await response.json();
+      const userData = {
+        id: data.id,
+        email: data.email,
+        name: data.name
+      };
+      localStorage.setItem('user', JSON.stringify(userData));
+      return userData;
+    } catch (error) {
+      if (error.message === 'Failed to fetch') {
+        throw new Error('서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.');
+      }
+      throw error;
+    }
+  },
+
+  register: async (email, username, password) => {
+    try {
+      const response = await fetch(`${API_URL}/v1/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          email: email,
+          passwd: password,
+          name: username
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || '회원가입에 실패했습니다.');
+      }
+
+      const data = await response.json();
+      return {
+        id: data.id,
+        email: data.email,
+        name: data.name
+      };
+    } catch (error) {
+      if (error.message === 'Failed to fetch') {
+        throw new Error('서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.');
+      }
+      throw error;
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem('user');
+  },
+
+  isAuthenticated: () => {
+    const user = localStorage.getItem('user');
+    return !!user && JSON.parse(user).id != null;
+  },
+
+  getCurrentUser: () => {
+    try {
+      const userStr = localStorage.getItem('user');
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (error) {
+      console.error('Failed to parse user data:', error);
+      localStorage.removeItem('user');
+      return null;
+    }
+  },
+
+  findPassword: async (username, email) => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.username === username && u.email === email);
+
+    if (!user) {
+      throw new Error('일치하는 사용자 정보를 찾을 수 없습니다.');
+    }
+
+    return {
+      message: '임시 비밀번호가 이메일로 전송되었습니다.'
+    };
+  },
+
+  getUserInfo: async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/v1/users/${userId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('사용자 정보를 가져오는데 실패했습니다.');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
+      throw error;
+    }
+  }
+};
+```
+</details>
 
 ---
 
@@ -121,6 +252,176 @@ Frontend/
   - `deleteBook(id)`: 도서 삭제
 - 내부적으로 `transformBookData()` 함수를 사용해 백엔드의 snake_case 응답을 camelCase로 변환합니다.
 
+<details> <summary> 코드 보기 (bookService.js)</summary>
+
+```js
+const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const API_URL = 'http://localhost:8080/api/v1/books';
+
+const transformBookData = (book) => ({
+  id: book.id,
+  title: book.title,
+  content: book.content,
+  imageUrl: book.image_url,
+  isDeleted: book.is_deleted,
+  createdAt: book.created_at,
+  updatedAt: book.updated_at,
+  user: book.user
+});
+
+export const bookService = {
+  getBooks: async () => {
+    try {
+      const response = await fetch(`${API_URL}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || '책 목록을 불러오는데 실패했습니다.');
+      }
+
+      const books = await response.json();
+      return books.map(transformBookData);
+    } catch (error) {
+      console.error('책 목록 조회 중 오류:', error);
+      throw error;
+    }
+  },
+
+  generateBook: async (bookData, options = { useLocalAI: true }) => {
+    const prompt = `Title: ${bookData.title}. Content: ${bookData.content}` +
+      " Please refer to what you posted and see the image for the book cover";
+
+    const response = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt,
+        n: 1,
+        size: "1024x1024",
+        quality: "standard"
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'AI 이미지 생성에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    const imageUrl = data?.data?.[0]?.url || null;
+
+    return {
+      ...bookData,
+      imageUrl
+    };
+  },
+
+  saveBook: async (bookData) => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user'));
+      const response = await fetch(`${API_URL}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: bookData.title,
+          content: bookData.content,
+          image_url: bookData.imageUrl,
+          userId: currentUser.id
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || '책 저장에 실패했습니다.');
+      }
+
+      const savedBook = await response.json();
+      return transformBookData(savedBook);
+    } catch (error) {
+      console.error('책 저장 중 오류:', error);
+      throw error;
+    }
+  },
+
+  deleteBook: async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || '책 삭제에 실패했습니다.');
+      }
+
+      const deletedBook = await response.json();
+      return transformBookData(deletedBook);
+    } catch (error) {
+      console.error('책 삭제 중 오류:', error);
+      throw error;
+    }
+  },
+
+  getBookById: async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || '책 정보를 불러오는데 실패했습니다.');
+      }
+
+      const book = await response.json();
+      return transformBookData(book);
+    } catch (error) {
+      console.error('책 조회 중 오류:', error);
+      throw error;
+    }
+  },
+
+  updateBook: async (id, bookData) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: bookData.title,
+          content: bookData.content,
+          image_url: bookData.imageUrl
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || '책 수정에 실패했습니다.');
+      }
+
+      const updatedBook = await response.json();
+      return transformBookData(updatedBook);
+    } catch (error) {
+      console.error('책 수정 중 오류:', error);
+      throw error;
+    }
+  }
+};
+```
+</details> 
   
 ## 📌 주요 기능 스크린샷
 ### 로그인
