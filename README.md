@@ -9,6 +9,7 @@
 - Node.js 16.0.0 이상
 - npm 또는 yarn
 - 권장 IDE: Visual Studio Code
+- 프로젝트 폴더의 최상단 .env(VITE_OPENAI_API_KEY=sk-0000) 추가
 
 ### 개발 환경
 - React 19.1.0
