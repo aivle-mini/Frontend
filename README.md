@@ -123,7 +123,7 @@ Frontend/
 ### 로그인
 - 이메일, 아이디, 비밀번호를 통해 회원가입합니다.
 <p float="left">
-  <img src="https://github.com/user-attachments/assets/2d1c7650-b314-4ef6-9c0d-2d8adb2dff54" width="500" height="400"/>
+  <img src="https://github.com/user-attachments/assets/785e2b60-5b0d-49fc-8890-818128931e08" width="500" height="400"/>
   <img src="https://github.com/user-attachments/assets/be2b1dd9-975d-4e96-a665-58836cc369cb" width="500" height="400"/>
 </p>
 
