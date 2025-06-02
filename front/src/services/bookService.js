@@ -38,7 +38,6 @@ export const bookService = {
       throw error;
     }
   },
-
   generateBook: async (bookData, options = { useLocalAI: true }) => {
     // OpenAI 직접 호출
     const prompt = `Title: ${bookData.title}. Content: ${bookData.content}` + " Please refer to what you posted and see the image for the book cover";
@@ -49,9 +48,11 @@ export const bookService = {
         Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
+        model: "dall-e-3",
         prompt,
         n: 1,
-        size: "512x512"
+        size: "1024x1024",
+        quality: "standard"
       })
     });
 
