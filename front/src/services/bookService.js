@@ -42,16 +42,17 @@ export const bookService = {
   generateBook: async (bookData, options = { useLocalAI: true }) => {
     // OpenAI 직접 호출
     const prompt = `Title: ${bookData.title}. Content: ${bookData.content}` + " Please refer to what you posted and see the image for the book cover";
-    const response = await fetch("https://api.openai.com/v1/images/generations", {
+
+    const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
-        prompt,
-        n: 1,
-        size: "512x512"
+        model: "gpt-4.1-mini",
+        input: prompt,
+        tools: [{ type: "image_generation" }]
       })
     });
 
@@ -61,7 +62,13 @@ export const bookService = {
     }
 
     const data = await response.json();
-    const imageUrl = data?.data?.[0]?.url || null;
+    const imageData = data.output?.find(output => output.type === "image_generation_call")?.result || null;
+
+    if (!imageData) {
+      throw new Error('AI 이미지 생성 결과를 처리할 수 없습니다.');
+    }
+
+    const imageUrl = `data:image/png;base64,${imageData}`;
 
     return {
       ...bookData,
