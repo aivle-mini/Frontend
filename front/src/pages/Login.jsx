@@ -8,7 +8,7 @@ function Login() {
   const { isDarkMode } = useTheme();
 
   const [formData, setFormData] = useState({
-    username: '',
+    username: '',   // API 스펙: username 사용
     password: ''
   });
   const [errorMsg, setErrorMsg] = useState('');
@@ -16,25 +16,29 @@ function Login() {
 
   /** 이메일 유효성 검사 */
   const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     return emailRegex.test(email);
   };
 
   /** 로그인 요청 */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg('');
-    setEmailError('');
+    setErrorMsg('');           // 에러 초기화
+    setEmailError('');        // 이메일 에러 초기화
 
+    // 이메일 형식 검증
     if (!validateEmail(formData.username)) {
-      setEmailError('유효한 이메일 형식이 아닙니다.');
+      setEmailError('올바른 이메일 형식이 아닙니다');
       return;
     }
 
     try {
       await authService.login(formData.username, formData.password);
+
+      // 도서 목록 페이지로 이동
       navigate('/books');
     } catch (err) {
+      // ❌ 실패: 메시지 표시
       setErrorMsg(err.message);
     }
   };
@@ -43,8 +47,14 @@ function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // 이메일 입력 시 실시간 유효성 검사
     if (name === 'username') {
-      setEmailError('');
+      if (value && !validateEmail(value)) {
+        setEmailError('올바른 이메일 형식이 아닙니다');
+      } else {
+        setEmailError('');
+      }
     }
   };
 
@@ -105,33 +115,34 @@ function Login() {
             letterSpacing: 2 
           }}>로그인</h1>
           <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <input
-              type="email"
-              name="username"
-              placeholder="이메일 입력"
-              value={formData.username}
-              onChange={handleChange}
-              style={{ 
-                padding: '12px', 
-                borderRadius: 8, 
-                border: `1px solid ${emailError ? '#ef4444' : isDarkMode ? '#4a5568' : '#cfd8dc'}`,
-                fontSize: 16, 
-                marginBottom: 4,
-                background: isDarkMode ? '#1a1a1a' : '#fff',
-                color: isDarkMode ? '#e5e7eb' : '#1a1a1a'
-              }}
-              required
-            />
-            {emailError && (
-              <div style={{ 
-                color: '#ef4444', 
-                fontSize: 12, 
-                marginTop: -2,
-                marginBottom: 4 
-              }}>
-                {emailError}
-              </div>
-            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <input
+                type="text"
+                name="username"
+                placeholder="이메일"
+                value={formData.username}
+                onChange={handleChange}
+                style={{ 
+                  padding: '12px', 
+                  borderRadius: 8, 
+                  border: `1px solid ${emailError ? '#ef4444' : isDarkMode ? '#4a5568' : '#cfd8dc'}`,
+                  fontSize: 16,
+                  background: isDarkMode ? '#1a1a1a' : '#fff',
+                  color: isDarkMode ? '#e5e7eb' : '#1a1a1a'
+                }}
+                required
+              />
+              {emailError && (
+                <div style={{ 
+                  color: '#ef4444', 
+                  fontSize: 12,
+                  marginTop: 2
+                }}>
+                  {emailError}
+                </div>
+              )}
+            </div>
+            
             <input
               type="password"
               name="password"
